@@ -12,6 +12,7 @@ public interface ServiceTask {
     class Empty extends Exception {}
 
     // entity handling
+    void deleteOne(long id, MUser user) throws Empty;
     TaskDetailResponse detail(Long id, MUser user);
     void addOne(AddTaskRequest req, MUser user) throws Existing, Empty, TooShort;
     void updateProgress(long taskID, int value);

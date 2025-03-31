@@ -7,6 +7,7 @@ import org.kickmyb.transfer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +30,7 @@ public class ServiceTaskImpl implements ServiceTask {
         // TODO si end est avant start c'est tout cassé.
         return Math.max((int) percentage, 0 );
     }
+
 
     @Override
     public TaskDetailResponse detail(Long id, MUser user) {
@@ -77,6 +79,19 @@ public class ServiceTaskImpl implements ServiceTask {
         user.tasks.add(t);
         repoUser.save(user);
     }
+
+    @Override
+    public void deleteOne(long id, MUser user) throws Empty{
+
+        MTask taskToRemove = repo.findById(id).get();
+
+        if (taskToRemove == null) throw new Empty();
+
+        user.tasks.remove(taskToRemove);
+        repo.delete(taskToRemove);
+        repoUser.save(user);
+    }
+
 
     @Override
     public void updateProgress(long taskID, int value) {
