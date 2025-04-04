@@ -4,8 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.kickmyb.server.account.MUser;
 import org.kickmyb.server.account.MUserRepository;
+import org.kickmyb.server.task.MTask;
+import org.kickmyb.server.task.MTaskRepository;
 import org.kickmyb.server.task.ServiceTask;
 import org.kickmyb.transfer.AddTaskRequest;
+import org.kickmyb.transfer.HomeItemResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,9 +19,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
+import java.util.List;
 
 import static org.assertj.core.api.Fail.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 // TODO pour celui ci on aimerait pouvoir mocker l'utilisateur pour ne pas avoir à le créer
 
@@ -111,5 +115,29 @@ class ServiceTaskTests {
         } catch (Exception e) {
             assertEquals(ServiceTask.Existing.class, e.getClass());
         }
+    }
+
+    @Test
+    void testDeleteWithValidId() throws ServiceTask.Empty, ServiceTask.TooShort, ServiceTask.Existing {
+        MUser alice = new MUser();
+        alice.username = "Alice";
+        alice.password = passwordEncoder.encode("Password123!");
+        userRepository.saveAndFlush(alice);
+
+        AddTaskRequest atr = new AddTaskRequest();
+        atr.name = "Tâche d'Alice";
+        atr.deadline = Date.from(new Date().toInstant().plusSeconds(3600));
+
+        serviceTask.addOne(atr, alice);
+
+          assertTrue(serviceTask.home(alice.id).size() > 0);
+
+            List<HomeItemResponse> tasks = serviceTask.home(alice.id);
+
+            serviceTask.deleteOne(0, alice);
+
+            MUser updatedUser = userRepository.findById(alice.id).get();
+
+            assertFalse(updatedUser.tasks.contains(tasks.get(0)));
     }
 }

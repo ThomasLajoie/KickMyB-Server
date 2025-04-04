@@ -57,7 +57,7 @@ public class ControllerTask {
         return serviceTask.detail(id, user);
     }
 
-    @GetMapping("/api/delete/{id}")
+    @PostMapping("/api/delete/{id}")
     public @ResponseBody  String DeleteOne(@PathVariable long id) throws ServiceTask.Empty {
         System.out.println("KICKB SERVER : Detail  with cookie ");
         ConfigHTTP.attenteArticifielle();

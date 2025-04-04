@@ -85,7 +85,7 @@ public class ServiceTaskImpl implements ServiceTask {
 
         MTask taskToRemove = repo.findById(id).get();
 
-        if (taskToRemove == null) throw new Empty();
+        user = repoUser.findById(user.id).orElseThrow();
 
         user.tasks.remove(taskToRemove);
         repo.delete(taskToRemove);
